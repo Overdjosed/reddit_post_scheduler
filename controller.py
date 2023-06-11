@@ -1,5 +1,8 @@
 import os
+import praw
 import sqlite3
+from time import sleep
+from random import sample
 from os.path import join
 
 def checkDir():
@@ -20,6 +23,7 @@ class Controlador:
     def __init__(self, path=os.getcwd()):
         # Busca ruta de Base de datos
         self.file_path = None
+        self.data = None
         self.name = None
         for root, _, files in os.walk(path):
             for file in files:
@@ -101,24 +105,52 @@ class Controlador:
     def update_programmer(self, *args):
         self.__connect(command="update", data = args[0], datatable = "programmer")
 
+    def sorted_data(self):
+        if not self.data:
+            # Muestra Bots de Upvotes
+            registros = self.__connect(command="show")
+
+            # Convertir los registros en una lista de diccionarios
+            self.data = []
+            for registro in registros:
+                diccionario = {
+                    'IdCliente': registro[1],
+                    'ClientSecret': registro[2],
+                    'UserAgent': registro[3],
+                    'Passw': registro[4],
+                    'Username': registro[5]
+                }
+                self.data.append(diccionario)
+
     def __str__(self) -> str:
         # Muestra Bots de Upvotes
-        registros = self.__connect(command="show")
-
-        # Convertir los registros en una lista de diccionarios
-        datos = []
-        for registro in registros:
-            diccionario = {
-                'IdCliente': registro[1],
-                'ClientSecret': registro[2],
-                'UserAgent': registro[3],
-                'Passw': registro[4],
-                'Username': registro[5]
-            }
-            datos.append(diccionario)
+        self.sorted_data()
 
         output = ""
-        for diccionario in datos:
+        for diccionario in self.data:
             output += "\nBot: "+ diccionario["Username"]+ "\n" + str(diccionario)+ "\n"
 
         return output
+
+
+    def upvote(self, total_upvotes, url, timeframe):
+
+        self.sorted_data()
+
+        if len(self.data) < total_upvotes:
+            random_elements = sample(self.data, total_upvotes)
+            for bot in random_elements:
+                reddit = praw.Reddit(
+                    client_id= bot[1],
+                    client_secret= bot[2],
+                    user_agent= bot[3],
+                    username= bot[5],
+                    password= bot[4]
+                )
+                sleep(timeframe)
+
+            target_url = url
+            post_id = target_url.split('/')[-3]
+
+            target = reddit.submission(id=post_id)
+            target.upvote()

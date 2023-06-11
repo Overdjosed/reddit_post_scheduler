@@ -105,6 +105,9 @@ class MyDialog(wx.Dialog):
             for element in ["Subreddit:", "Title:", "Url:", "Date:", "Hour:", "Minute:"]:
                 output.append(self.__text_label(sizer, element))
 
+        else:
+            output.append(self.__text_label(sizer, "url:"))
+
         # Creacion y adición de boton de aceptar
         yes_button = wx.Button(self, label="Aceptar")
         yes_button.Bind(wx.EVT_BUTTON, self.on_yes)
@@ -124,7 +127,8 @@ class MyDialog(wx.Dialog):
         # Eleccion de elementos por su nombre o texto
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        question_label = wx.StaticText(self, label = question)
+        question_label = wx.StaticText(self, label = question, size = (100, 30))
+        sizer.Add(question_label, 0, wx.ALIGN_CENTER, 3)
         button_sizer = None
 
         # Creacion de botones con ayuda de función generica
@@ -165,24 +169,21 @@ class MyDialog(wx.Dialog):
 
 class MyFrame(wx.Frame):
 
-    def __init__(self, func1, func2, titulo, subtitulo):
+    def __init__(self, funcs = None, titulo = "Base de Datos", subtitulo = "Reddit"):
         # Ventana con título
         super().__init__(None, title= titulo)
         # Ventana sin título en constante reutilizacion
         self.dialog = MyDialog(self, title=subtitulo)
         panel = wx.Panel(self)
 
-        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        button_sizer = wx.BoxSizer(wx.VERTICAL)
 
+        for element in funcs:
         # Creación de ventanas principales mediante botones
-        button = wx.Button(panel, label="Entrar en la Base")
-        button.Bind(wx.EVT_BUTTON, func1)
+            button = wx.Button(panel, label=element[1])
+            button.Bind(wx.EVT_BUTTON, element[0])
+            button_sizer.Add(button, 0, wx.ALIGN_CENTER|wx.ALL, 10)
 
-        button1 = wx.Button(panel, label="Base de datos de Publicaciones")
-        button1.Bind(wx.EVT_BUTTON, func2)
-
-        button_sizer.Add(button, 0, wx.ALIGN_CENTER|wx.ALL, 10)
-        button_sizer.Add(button1, 0, wx.ALIGN_CENTER|wx.ALL, 10)
         button_sizer.AddStretchSpacer()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -209,7 +210,7 @@ class MyFrame(wx.Frame):
         self.dialog.clear_window()
         return self.dialog.selected
 
-    def text_question(self, dbase = "Bots"):
+    def text_question(self, dbase = "bots"):
         # Creacion de ventana de insercion de textos según la base de datos
         result = self.dialog.text_question(database = dbase)
         self.dialog.clear_window()
