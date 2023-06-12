@@ -105,8 +105,8 @@ class MyDialog(wx.Dialog):
             for element in ["Subreddit:", "Title:", "Url:", "Date:", "Hour:", "Minute:"]:
                 output.append(self.__text_label(sizer, element))
 
-        else:
-            output.append(self.__text_label(sizer, "url:"))
+        elif database == None:
+            output.append(self.__text_label(sizer, "Url:"))
 
         # Creacion y adición de boton de aceptar
         yes_button = wx.Button(self, label="Aceptar")
@@ -115,13 +115,7 @@ class MyDialog(wx.Dialog):
         self._buttons.append(yes_button)
 
         self.SetSizerAndFit(sizer, deleteOld= False)
-
-        # Si se acepta, devuelve los datos
-        if self.ShowModal() == wx.ID_YES:
-            output = [element.GetValue() for element in output]
-            return output
-        else:
-            return None
+        return output
 
     def choose_element(self, question, elements):
         # Eleccion de elementos por su nombre o texto
@@ -138,7 +132,6 @@ class MyDialog(wx.Dialog):
         sizer.Add(button_sizer, 0, wx.ALIGN_CENTER)
         self._buttons.append(button_sizer)
         self._buttons.append(question_label)
-        self._buttons.append(sizer)
         self.SetSizerAndFit(sizer)
 
 
@@ -150,6 +143,7 @@ class MyDialog(wx.Dialog):
 
     def on_yes(self, event):
         # Boton Afirmativo
+        self._selected = True
         self.EndModal(wx.ID_YES)
 
     def on_button_click(self, event):
@@ -165,6 +159,7 @@ class MyDialog(wx.Dialog):
 
     def on_no(self, event):
         # Botón Negativo
+        self._selected = False
         self.EndModal(wx.ID_NO)
 
 class MyFrame(wx.Frame):
@@ -213,5 +208,9 @@ class MyFrame(wx.Frame):
     def text_question(self, dbase = "bots"):
         # Creacion de ventana de insercion de textos según la base de datos
         result = self.dialog.text_question(database = dbase)
+        output = None
+        self.dialog.ShowModal()
+        if self.dialog.selected == True:
+            output = [element.GetValue() for element in result]
         self.dialog.clear_window()
-        return result
+        return output

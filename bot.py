@@ -20,7 +20,6 @@ def main():
             # Comprobación en terminal (Pruebas)
             # frame.warning_message("Los datos se han subido correctamente\nComprobacion en terminal:")
             # print(controlador)
-        frame.Close()
 
     def programmer_dialog(event):
         controlador = ctrl.Controlador()
@@ -33,29 +32,31 @@ def main():
             data = frame.text_question(dbase="programmer")
             # Seleccion de post
             file = frame.choose_element("Seleccionar Post", controlador.get_photos())
+
             # Subida de elementos a Base de datos
-            controlador.update_programmer(file + data)
+            elements = [None]*7
+            elements[0] = file
+            for i in range(len(data)): elements[i+1] = data[i]
+
+            controlador.update_programmer(elements)
             # Mensaje de Aviso (Opcional)
             # frame.warning_message("Los datos se han subido correctamente")
-
-        frame.Close()
 
     def upvote_dialog(event):
         controlador = ctrl.Controlador()
         if controlador.is_empty():
             controlador.create_db()
         controlador.sorted_data()
+
         lenght = len(controlador.data)
-        upvotes = [int(lenght) * 0.25, int(lenght) * 0.5, int(lenght)* 0.75, int(lenght)]
+        upvotes = [int(lenght * 0.25), int(lenght * 0.5), int(lenght* 0.75), int(15)]
         choice = frame.choose_element(f"{lenght} Bots.\nTotal upvotes:",
                                 [f"{upvotes[2]}/h --- 20m", f"{upvotes[1]}/h --- 10m", f"{upvotes[0]}/h --- 7m"])
 
-        url = frame.text_question(dbase = "")
-        total = findall(r'\d+', choice[:4])
-        tf = findall(r'\d+', choice[3:])
-        controlador.upvote(total, url, tf / total)
-
-        frame.close()
+        url = frame.text_question(dbase = None)
+        total = int(findall(r'\d+', choice[:4])[0])
+        tf = int(findall(r'\d+', choice[3:])[0])
+        controlador.upvote(total, url[0], (tf / total) * 60)
 
     ctrl.makeDir()
     app = wx.App()

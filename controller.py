@@ -1,13 +1,13 @@
-import os
-import praw
-import sqlite3
+from os import listdir, getcwd, walk, mkdir
+from praw import Reddit
+from sqlite3 import connect
 from time import sleep
 from random import sample
 from os.path import join
 
 def checkDir():
     # Revisa si carpeta existe
-    if 'posts' in os.listdir(os.getcwd()):
+    if 'posts' in listdir(getcwd()):
         return True
     return False
 
@@ -16,16 +16,16 @@ def makeDir():
         return
     else:
         # Crea carpeta si no existe carpeta de posts
-        os.mkdir(os.getcwd() + '\\posts')
+        mkdir(getcwd() + '\\posts')
 
 class Controlador:
 
-    def __init__(self, path=os.getcwd()):
+    def __init__(self, path = getcwd()):
         # Busca ruta de Base de datos
         self.file_path = None
         self.data = None
         self.name = None
-        for root, _, files in os.walk(path):
+        for root, _, files in walk(path):
             for file in files:
                 if file.endswith(".db"):
                     self.file_path = root
@@ -39,7 +39,7 @@ class Controlador:
         return self.name is None
 
     def __connect(self, command, data = None, datatable = "bots"):
-        conexion = sqlite3.connect(self.name)
+        conexion = connect(self.name)
         # Crear un cursor para ejecutar comandos SQL
         cursor = conexion.cursor()
 
@@ -83,11 +83,11 @@ class Controlador:
 
     def get_photos(self):
         # Introduce los archivos .jpg y .png de la carpeta posts
-        conexion = sqlite3.connect(self.name)
+        conexion = connect(self.name)
         cursor = conexion.cursor()
 
         photos = []
-        for _, _, files in os.walk(self.file_path+"\\posts"):
+        for _, _, files in walk(self.file_path+"\\posts"):
                 for file in files:
                     if file.endswith(".jpg") or file.endswith(".png"):
                         photos.append(file)
@@ -140,7 +140,7 @@ class Controlador:
         if len(self.data) < total_upvotes:
             random_elements = sample(self.data, total_upvotes)
             for bot in random_elements:
-                reddit = praw.Reddit(
+                reddit = Reddit(
                     client_id= bot[1],
                     client_secret= bot[2],
                     user_agent= bot[3],
