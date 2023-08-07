@@ -5,9 +5,9 @@ Este es un código que permite programar publicaciones y videos para subirlos en
 
 ## Archivos
 
-- [db.py](http://db.py/): Este archivo contiene la base de datos y se encarga de guardar toda la información ingresada a través del GUI. Almacena usuarios, subreddits, archivos y publicaciones programadas.
-- [gui.py](http://gui.py/): Permite interactuar con la base de datos, permitiendo agregar o eliminar usuarios, posts o subreddits. También facilita la programación de publicaciones y videos, especificando si serán NSFW (Not Safe For Work) o no. Además, permite proporcionar una URL de salida (opcional).
-- tasks_admin.py: Este código se ejecutará automáticamente cada hora para subir los posts sin interacción del usuario. En sistemas Windows, deberá configurarse en el Administrador de tareas (Task Scheduler), mientras que en sistemas Linux, se proporcionará un programa para instalar el Administrador de tareas.
+- [db.py](https://github.com/Overdjosed/reddit/blob/master/reddit_scheduler/db.py): Este archivo contiene la base de datos y se encarga de guardar toda la información ingresada a través del GUI. Almacena usuarios, subreddits, archivos y publicaciones programadas.
+- [gui.py](https://github.com/Overdjosed/reddit/blob/master/reddit_scheduler/gui.py): Permite interactuar con la base de datos, permitiendo agregar o eliminar usuarios, posts o subreddits. También facilita la programación de publicaciones y videos, especificando si serán NSFW (Not Safe For Work) o no. Además, permite proporcionar una URL de salida (opcional).
+- [tasks_admin.py](https://github.com/Overdjosed/reddit/blob/master/reddit_scheduler/tasks_admin.py): Este código se ejecutará automáticamente cada hora para subir los posts sin interacción del usuario. En sistemas Windows, deberá configurarse en el Administrador de tareas (Task Scheduler), mientras que en sistemas Linux, se proporcionará un programa para instalar el Administrador de tareas.
 
 ## Instalación y Configuración
 
@@ -23,7 +23,7 @@ Para instalar la tarea programada en el Administrador de tareas de Windows, sigu
 
 ## Uso
 
-Ejecuta el archivo [gui.py](http://gui.py/) para interactuar con el programa. En el apartado "Users", introduce tu nombre de usuario y contraseña de Reddit reales. Los otros parámetros se usarán por defecto.
+Ejecuta el archivo [gui.py](https://github.com/Overdjosed/reddit/blob/master/reddit_scheduler/gui.py) para interactuar con el programa. En el apartado "Users", introduce tu nombre de usuario y contraseña de Reddit reales. Los otros parámetros se usarán por defecto.
 
 Podrás agregar o eliminar usuarios, posts o subreddits utilizando las opciones disponibles en el GUI.
 
