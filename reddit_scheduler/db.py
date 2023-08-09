@@ -24,7 +24,7 @@ class Controlador:
     def __init__(self, path = getcwd()):
         self.__arch = {"Users":("IdCliente TEXT, ClientSecret TEXT, UserAgent TEXT, Passw TEXT, Username TEXT",5, "Username"),
                        "Subreddits": ("Subreddit TEXT",1, "Subreddit"),
-                       "Scheduler": ("File TEXT,Subreddit TEXT,Title TEXT,Url TEXT,Date TEXT,Hour TEXT, User TEXT, Checkbox TEXT",8, "Date")}
+                       "Scheduler": ("File TEXT,Subreddit TEXT,Title TEXT,Url TEXT,Date TEXT,Hour TEXT, User TEXT, Checkbox TEXT",8, "Date",("Title","Date"))}
         # Busca ruta de Base de datos
         self.file_path = None
         self.data = None
@@ -74,9 +74,15 @@ class Controlador:
         self.cursor.execute("SELECT  * FROM {} WHERE {} = ?".format(type,self.__arch[type][2]),(value,))
         self.connection.commit()
         tuplas = self.cursor.fetchall()[0]
-        return {"client_id": tuplas[0], "client_secret": tuplas[1], "username": tuplas[2], "password": tuplas[3], "user_agent": tuplas[4]}
+        return {"client_id": tuplas[0], "client_secret": tuplas[1], "username": tuplas[4], "password": tuplas[3], "user_agent": tuplas[2]}
 
     def delete_element(self, value, type):
+        if type == "Scheduler":
+            print("\n\n",value,"\n\n")
+            self.cursor.execute("DELETE FROM Scheduler WHERE Title = ? AND Date = ?", (value[1], value[0]))
+            self.connection.commit()
+            return
+
         print("DELETE FROM {} WHERE {} = ?".format(type,self.__arch[type][2]),(value,))
         self.cursor.execute("DELETE FROM {} WHERE {} = ?".format(type,self.__arch[type][2]),(value,))
         self.connection.commit()
