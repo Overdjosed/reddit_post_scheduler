@@ -52,6 +52,9 @@ class App:
         Args:
             root (_type_): the main App, where the gui its created
             media (list): Save the paths to the photos
+            self.delete_subreddit_entry: It refers to the Combobox to delete the deleted subreddits
+            self.post_to_delete: It refers to the Combobox to delete the deleted posts
+            self.choose_subreddit: It retrieves the data of the subreddit
             self.__user_entries (dict): Retrieve the data of the client to save data in the database
             self.__post_entries (dict): Retrieve the data of the Post to save data in the database
             self.tab_left (frame): Tab to interact with the database of Users and Subreddits
@@ -60,9 +63,11 @@ class App:
         # General Division
         self.root = root
         self.media = []
+        self.delete_subreddit_entry = None
+        self.post_to_delete = None
         self.__user_entries = {"ClientId": None, "ClientSecret": None, "UserAgent": None, "Password": None, "Username": None}
         self.__post_entries = {"Day":None, "Month": None, "Hour":None, "Title": None, "URL": None, "Media": [], "User":None, "Subreddit": None, "Checkbox": None}
-
+        self.choose_subreddit = None
         self.tab_left = ctk.CTkTabview(master = root, width = 500, height = 430)
         self.tab_left.grid(row = 1, column = 1, padx = 10)
 
@@ -70,15 +75,18 @@ class App:
         self.frame_right.grid(row = 1, column = 2)
         self.db = ctrl.Controlador()
 
+        self.post_frame = ctk.CTkFrame(master = self.frame_right)
+        self.post_frame.grid(row = 1, column = 1, padx = 10, pady = 10)
+
         self.subreddit_frame = self.tab_left.add("Subreddits")
         user_frame = self.tab_left.add("Users")
-        self.post_frame = self.tab_left.add("Posts")
+        self.delpost_frame = self.tab_left.add("Posts")
 
-        post_label = ctk.CTkLabel(self.post_frame, text = "Delete:")
+        post_label = ctk.CTkLabel(self.delpost_frame, text = "Delete:")
         post_label.grid(row = 1, column = 1, padx = 10, pady = 30)
-        self.post_to_delete = ctk.CTkOptionMenu(self.post_frame, values= self.db.show_database("Scheduler"), width= 220)
-        self.post_to_delete.grid(row = 1, column = 2, padx = 10, pady = 10)
-        add_button = ctk.CTkButton(self.post_frame, text = "Submit", command=self.delete_post) # TODO: COMMAND
+
+        self.__frame_to_delete_post()
+        add_button = ctk.CTkButton(self.delpost_frame, text = "Submit", command=self.delete_post)
         add_button.grid(row = 1, column = 3, padx = 10, pady = 10)
 
         # Subreddits GUI
@@ -86,14 +94,13 @@ class App:
         sbt.grid(row = 2, column = 1, padx = 40, pady = 40)
         self.entrysub = ctk.CTkEntry(self.subreddit_frame)
         self.entrysub.grid(row = 2, column = 2, padx = 10, pady = 30)
-        add_button = ctk.CTkButton(self.subreddit_frame, text = "Submit",command = self.__add_subreddit) #TODO COMMAND
+        add_button = ctk.CTkButton(self.subreddit_frame, text = "Submit",command = self.__add_subreddit)
         add_button.grid(row = 2, column = 3, padx = 10, pady = 10)
 
         dele = ctk.CTkLabel(self.subreddit_frame, text = "Delete:")
         dele.grid(row = 4, column = 1, padx = 10, pady = 30)
-        self.sbdelete = ctk.CTkOptionMenu(self.subreddit_frame, values= self.db.show_database("Subreddits"))
-        self.sbdelete.grid(row = 4, column = 2, padx = 10, pady = 10)
-        add_button = ctk.CTkButton(self.subreddit_frame, text = "Submit", command=self.__delete_subreddit) # TODO: COMMAND
+        self.__subreddit_option_menu()
+        add_button = ctk.CTkButton(self.subreddit_frame, text = "Submit", command=self.__delete_subreddit)
         add_button.grid(row = 4, column = 3, padx = 10, pady = 10)
 
         add_user_frame = ctk.CTkFrame(user_frame)
@@ -108,7 +115,7 @@ class App:
             self.__user_entries[label_text].grid(row=i, column=2, padx=5, pady=5)
 
         # Button to append it to the Database
-        add_button = ctk.CTkButton(add_user_frame, text = "Submit", width = 300, command=self.__add_user_button)#TODO: COMMAND
+        add_button = ctk.CTkButton(add_user_frame, text = "Submit", width = 300, command=self.__add_user_button)
         add_button.grid(row = 9, column = 2, padx = 5, pady = 5)
 
         self.us_del_frame = ctk.CTkFrame(user_frame)
@@ -118,20 +125,18 @@ class App:
         delelbl = ctk.CTkLabel(self.us_del_frame, text = "Delete:")
         delelbl.grid(row = 1, column = 1, padx = 20, pady = 10)
 
-        self.userdelete = ctk.CTkOptionMenu(self.us_del_frame, values= self.db.show_database("Users"))
-        self.userdelete.grid(row = 1, column = 2, padx = 10, pady = 10)
+        self.user_delete_option()
 
-        del_user_button = ctk.CTkButton(self.us_del_frame, text = "Submit", command= self.__delete_user_button)# TODO: COMMAND
+        del_user_button = ctk.CTkButton(self.us_del_frame, text = "Submit", command= self.__delete_user_button)
         del_user_button.grid(row = 1, column = 3, padx = 10, pady = 10)
 
 
-
         ## Division for Content, calendar and entries
-        self.intraframe_up = ctk.CTkFrame(master = self.frame_right, width = 500, height = 250)
-        self.intraframe_up.grid(row = 1, column = 1, padx = 15, pady = 15)
+        self.intraframe_up = ctk.CTkFrame(master = self.post_frame, width = 500, height = 250)
+        self.intraframe_up.grid(row = 1, column = 1, padx = 15, pady = 17)
 
-        self.intraframe_down = ctk.CTkFrame(master = self.frame_right, width= 500, height= 250)
-        self.intraframe_down.grid(row = 2, column = 1)
+        self.intraframe_down = ctk.CTkFrame(master = self.post_frame, width= 500, height= 250)
+        self.intraframe_down.grid(row = 2, column = 1, padx = 15, pady = 17)
 
         ### Creating Frame for Button
         self.scrollable_images = ctk.CTkScrollableFrame(master = self.intraframe_up, orientation= "horizontal", width = 240, height= 125)
@@ -162,40 +167,84 @@ class App:
         self.__post_entries["URL"] = ctk.CTkEntry(master = self.intraframe_down, width = 340)
         self.__post_entries["URL"].grid(row = 2,column = 2, pady  = 10, padx = 20)
 
-        # Bombobox Menu Subreddits
-        users_lbl = ctk.CTkLabel(master = self.intraframe_down, text = "Subreddit:")
-        users_lbl.grid(row = 4, column = 1, pady = 3, padx =10)
-        self.__post_entries["Subreddit"] = ctk.CTkComboBox(master = self.intraframe_down, values = self.db.show_database("Subreddits"), width= 340)
-        self.__post_entries["Subreddit"].grid(row = 4, column  = 2, pady  = 10, padx = 20)
-
         # Option Menu Users
         users_lbl = ctk.CTkLabel(master = self.intraframe_down, text = "User:")
-        users_lbl.grid(row = 5, column = 1, pady = 3, padx =10)
-        self.__post_entries["User"] = ctk.CTkOptionMenu(master = self.intraframe_down, values = self.db.show_database("Users"), width= 340)
-        self.__post_entries["User"].grid(row = 5, column  = 2, pady  = 10, padx = 20)
-
-        ## CheckBox
-        self.__post_entries["Checkbox"] = ctk.CTkCheckBox(master = self.intraframe_down, text = "NSFW")
-        self.__post_entries["Checkbox"].grid(row = 6, column = 1, padx = 30, sticky = "nsew")
+        users_lbl.grid(row = 4, column = 1, pady = 3, padx =10)
+        self.user_option_frame()
+        self.__create_subreddit_checkbox()
 
         ## Submit_button
         submit_scheduler = ctk.CTkButton(master = self.intraframe_down, text = "Submit", command= self.on_submit_post)
-        submit_scheduler.grid( row = 6, column = 2, pady = 10)
+        submit_scheduler.grid(row = 6, column = 2, pady = 10)
+
+    def user_delete_option(self):
+        if isinstance(self, ctk.CTkOptionMenu):
+            self.userdelete.destroy()
+        self.userdelete = ctk.CTkOptionMenu(self.us_del_frame, values= self.db.show_database("Users"))
+        self.userdelete.grid(row = 1, column = 2, padx = 10, pady = 10)
+
+
+    def user_option_frame(self):
+        if isinstance(self, ctk.CTkOptionMenu):
+            self.__post_entries["User"].destroy()
+        self.__post_entries["User"] = ctk.CTkOptionMenu(master = self.intraframe_down, values = self.db.show_database("Users"), width= 340)
+        self.__post_entries["User"].grid(row = 5, column  = 2, pady  = 3, padx = 10)
+
+
+    def __frame_to_delete_post(self):
+            if isinstance(self.choose_subreddit, ctk.CTkOptionMenu):
+                self.post_to_delete.destroy()
+            self.post_to_delete = ctk.CTkOptionMenu(self.delpost_frame, values= self.db.show_database("Scheduler"), width= 220)
+            self.post_to_delete.grid(row = 1, column = 2, padx = 10, pady = 10)
+
+
+    def __subreddit_option_menu(self):
+        if isinstance(self.choose_subreddit, ctk.CTkOptionMenu):
+            self.sbdelete.destroy()
+        self.sbdelete = ctk.CTkOptionMenu(self.subreddit_frame, values= self.db.show_database("Subreddits"))
+        self.sbdelete.grid(row = 4, column = 2, padx = 10, pady = 10)
+
+
+    def __create_subreddit_checkbox(self):
+            if isinstance(self.choose_subreddit, ctk.CTkFrame):
+                self.choose_subreddit.destroy()
+            self.choose_subreddit = ctk.CTkFrame(master= self.frame_right, width = 190, height = 100)
+            self.choose_subreddit.grid(row = 1,column = 2, padx = 10, pady = 10)
+            _ = ctk.CTkLabel(master = self.choose_subreddit, text = "Subreddit/s:", font = ctk.CTkFont(family="Helvetica", size=14))
+            _.pack(padx = 10, pady = 7)
+            self.scroller = ctk.CTkScrollableFrame(master = self.choose_subreddit, orientation= "vertical", width  = 150, height= 50)
+            self.scroller.pack(padx = 10, pady = 10, fill = "both")
+
+            sb = self.db.show_database("Subreddits")
+            self.__post_entries["Subreddit"] = []
+            for i in range(len(sb)):
+                self.__post_entries["Subreddit"].append(ctk.CTkCheckBox(master = self.scroller, text = sb[i]))
+                self.__post_entries["Subreddit"][-1].pack(padx = 5, pady = 5, side = "bottom", fill = "both")
+                self.__post_entries["Subreddit"][-1].pack_propagate(False)
+
+            ## CheckBox
+            self.__post_entries["Checkbox"] = (ctk.CTkCheckBox(master = self.choose_subreddit, text = "NSFW"),
+                                               ctk.CTkCheckBox(master = self.choose_subreddit, text = "GIF"))
+
+            self.__post_entries["Checkbox"][0].pack(padx = 10, pady = 10)
+            self.__post_entries["Checkbox"][1].pack(padx = 10, pady = 10)
+
 
     def delete_post(self):
+        """Delete a post using methods of db.py by title and date"""
         splitted = self.post_to_delete.get().split(":")
         title = splitted[2]
-        date = splitted[1].split(",")
-        date = date[0][1:]
+        date = splitted[1].split(",")[0][1:]
 
         self.db.delete_element((date,title[1:]),type = "Scheduler")
-        self.post_to_delete.destroy()
-        self.post_to_delete = ctk.CTkOptionMenu(self.post_frame, values= self.db.show_database("Scheduler"), width= 220)
-        self.post_to_delete.grid(row = 1, column = 2, padx = 10, pady = 10)
+        self.__frame_to_delete_post()
+
 
     def calendar(self,root):
+        """When the button is pressed, gui creates a new window with entries of Date,hour,year"""
         button_date = ctk.CTkButton(text ="Schedule date",master = root, command=self.__on_calendar_button_click)
         button_date.grid(row  =1, column = 1)
+
 
     def __on_calendar_button_click(self):
         new_window = ctk.CTkFrame(self.intraframe_up)
@@ -223,29 +272,23 @@ class App:
         month.grid(row = 2, column = 2, pady = 1.5,  sticky = 'nsew')
         hour.grid(row = 3, column = 2, pady = 1.5, sticky = 'nsew')
 
+
     def __delete_subreddit(self):
         print(f"Subreddit a Borrar: {self.sbdelete.get()}")
         self.db.delete_element(self.sbdelete.get(),"Subreddits")
-        self.__post_entries["Subreddit"].destroy()
         self.__post_entries["User"].destroy()
-        self.sbdelete.destroy()
-        self.__post_entries["Subreddit"] = ctk.CTkComboBox(master = self.intraframe_down, values = self.db.show_database("Subreddits"), width= 340)
-        self.__post_entries["Subreddit"].grid(row = 4, column  = 2, pady  = 3, padx = 10)
-        self.__post_entries["User"] = ctk.CTkOptionMenu(master = self.intraframe_down, values = self.db.show_database("Users"), width= 340)
-        self.__post_entries["User"].grid(row = 5, column  = 2, pady  = 3, padx = 10)
-        self.sbdelete = ctk.CTkOptionMenu(self.subreddit_frame, values= self.db.show_database("Subreddits"))
-        self.sbdelete.grid(row = 4, column = 2, padx = 10, pady = 10)
+        self.__subreddit_option_menu()
+        self.__create_subreddit_checkbox()
         return self.sbdelete.get()
+
 
     def __add_subreddit(self):
         print(f"Subreddit agregado: {self.entrysub.get()}")
         self.db.add_element(str(self.entrysub.get()),"Subreddits")
-
-        self.__post_entries["Subreddit"] = ctk.CTkComboBox(master = self.intraframe_down, values = self.db.show_database("Subreddits"), width= 340)
-        self.__post_entries["Subreddit"].grid(row = 4, column  = 2, pady  = 3, padx = 10)
-        self.sbdelete = ctk.CTkOptionMenu(self.subreddit_frame, values= self.db.show_database("Subreddits"))
-        self.sbdelete.grid(row = 4, column = 2, padx = 10, pady = 10)
+        self.__subreddit_option_menu()
+        self.__create_subreddit_checkbox()
         return self.entrysub.get()
+
 
     def __add_user_button(self):
         data = []
@@ -253,50 +296,58 @@ class App:
             data.append(value.get())
             print(key, ":", value.get() if type(value) != list else value)
         self.db.add_element(data,"Users")
-        self.userdelete = ctk.CTkOptionMenu(self.us_del_frame, values= self.db.show_database("Users"))
-        self.userdelete.grid(row = 1, column = 2, padx = 10, pady = 10)
-        self.__post_entries["Subreddit"] = ctk.CTkComboBox(master = self.intraframe_down, values = self.db.show_database("Subreddits"), width= 340)
-        self.__post_entries["Subreddit"].grid(row = 4, column  = 2, pady  = 3, padx = 10)
-        self.__post_entries["User"] = ctk.CTkOptionMenu(master = self.intraframe_down, values = self.db.show_database("Users"), width= 340)
-        self.__post_entries["User"].grid(row = 5, column  = 2, pady  = 3, padx = 10)
+        self.__create_subreddit_checkbox()
+        self.user_option_frame()
+        self.user_delete_option()
         return self.__user_entries
+
 
     def __delete_user_button(self):
         print(f"User a borrar: {self.userdelete.get()}")
         self.db.delete_element(value = str(self.userdelete.get()), type = "Users")
-        self.__post_entries["Subreddit"].destroy()
-        self.__post_entries["User"].destroy()
-        self.userdelete.destroy()
-        self.__post_entries["Subreddit"] = ctk.CTkComboBox(master = self.intraframe_down, values = self.db.show_database("Subreddits"), width= 340)
-        self.__post_entries["Subreddit"].grid(row = 4, column  = 2, pady  = 3, padx = 10)
-        self.__post_entries["User"] = ctk.CTkOptionMenu(master = self.intraframe_down, values = self.db.show_database("Users"), width= 340)
-        self.__post_entries["User"].grid(row = 5, column  = 2, pady  = 3, padx = 10)
-        self.userdelete = ctk.CTkOptionMenu(self.us_del_frame, values= self.db.show_database("Users"))
-        self.userdelete.grid(row = 1, column = 2, padx = 10, pady = 10)
+        self.__create_subreddit_checkbox()
+        self.user_option_frame()
+        self.user_delete_option()
         return self.userdelete
 
-    def on_submit_post(self):
-        for key, value in self.__post_entries.items():
-            print(key, ":", value.get() if type(value) != list else value)
-        data = []
-        for element in ["Media", "Subreddit", "Title", "URL", "Date", "Hour","User", "Checkbox"]:
 
-            if element == "Date":
-                day = self.__post_entries["Day"].get()
-                self.__post_entries["Day"]
-                month = self.__post_entries["Month"].get()
-                self.__post_entries["Month"]
-                self.__post_entries["Month"]
-                data.append(f"{day}/{month}/{str(time.localtime(time.time()).tm_year)}")
-            elif type(self.__post_entries[element]) == list:
-                cadena_files = ""
-                for file in self.__post_entries[element]:
-                    cadena_files += f"@@{file}"
-                data.append(cadena_files)
-                self.__post_entries[element].clear()
-            else:
-                data.append(self.__post_entries[element].get())
-                self.__post_entries[element]
+    def on_submit_post(self):
+        """When all of the data is allocated and the submit button is pressed, post data gets saved in reddit.db"""
+        data = []
+
+        try:
+            for element in ["Media", "Subreddit", "Title", "URL", "Date", "Hour","User", "Checkbox"]:
+                if element == "Date":
+                    day = self.__post_entries["Day"].get()
+                    self.__post_entries["Day"]
+                    month = self.__post_entries["Month"].get()
+                    data.append(f"{day}/{month}/{str(time.localtime(time.time()).tm_year)}")
+
+                elif element == "Media":
+                    cadena_files = ""
+                    for file in self.__post_entries[element]:
+                        cadena_files += f"@@{file}"
+                    data.append(cadena_files)
+                    self.__post_entries[element].clear()
+
+                elif element == "Subreddit":
+                    subreddit_text = ""
+                    for checkbox in self.__post_entries["Subreddit"]:
+                        if checkbox.get() == True:
+                            subreddit_text += f"@@{checkbox._text}"
+                    data.append(subreddit_text)
+
+                elif element == "Checkbox":
+                    nsfw = self.__post_entries["Checkbox"][0].get()
+                    gif = self.__post_entries["Checkbox"][1].get()
+                    data.append(f"{nsfw}{gif}")
+                    self.__post_entries["Checkbox"] = None
+
+                else:
+                    data.append(self.__post_entries[element].get())
+                    self.__post_entries[element] = None
+        except AttributeError:
+            messagebox.showwarning(message = f"You must choose a date and time")
 
         self.add_media_frame.forget()
         frame = ctk.CTkFrame(self.scrollable_images, width=100, height=150, fg_color= "black")
@@ -304,11 +355,10 @@ class App:
         frame.pack(padx=10, pady=10, fill="both", expand=True, side="right")
         self.add_media_frame.pack(padx=10, pady=10, fill="both", expand=True, side="left")
 
-
         self.db.add_element(data,type = "Scheduler")
-        self.post_to_delete = ctk.CTkOptionMenu(self.post_frame, values= self.db.show_database("Scheduler"), width= 220)
-        self.post_to_delete.grid(row = 1, column = 2, padx = 10, pady = 10)
+        self.__frame_to_delete_post()
         return self.__post_entries
+
 
     def valid_image(self, image):
         t = image.split(".")[-1]
@@ -319,7 +369,6 @@ class App:
         # Ask for a file
         filename = filedialog.askopenfilename()
         valid, is_video = self.valid_image(filename)
-
         if not valid:
             messagebox.showwarning(message = f"Non Valid Image. Format is not correct, only {App.VIDEO_FORMATS}, {App.PHOTO_FORMATS}")
 
@@ -345,6 +394,7 @@ class App:
         content.place(relx=0.5, rely=0.5, anchor="center")
         self.reload_media()
 
+
     def update_video(self, label, vid, size):
         # Retrieve data if its possible
         ret, frame = vid.get_frame()
@@ -354,6 +404,7 @@ class App:
             label.configure(image=img)
         # While possible, repeat process
         self.root.after(vid.delay, lambda: self.update_video(label, vid, size))
+
 
     def reload_media(self):
         # While is charging, packforget allows to not show frame
@@ -366,6 +417,7 @@ class App:
 
 
 def get_thumbnail_path(video_path):
+    """Get first frame of the video and choose it as a Thumbnail"""
     image_path = "my_video_frame.png"
     video = cv2.VideoCapture(video_path)
     fps = video.get(cv2.CAP_PROP_FPS)
@@ -378,6 +430,6 @@ def get_thumbnail_path(video_path):
 
 if __name__ == "__main__":
     root = ctk.CTk()
-    root.geometry(("1070x450"))
+    root.geometry(("1215x450"))
     app = App(root)
     root.mainloop()

@@ -58,15 +58,16 @@ class Controlador:
         if type == "Subreddits":
             num = "?, "*(self.__arch[type][1])
             args = self.__arch[type][0].replace(" TEXT","")
-            print(f"INSERT INTO {type} ({args}) VALUES ({num[:-2]})", data)
+            # print(f"INSERT INTO {type} ({args}) VALUES ({num[:-2]})", data)
             self.cursor.execute(f"INSERT INTO Subreddits (Subreddit) VALUES (?)", (data,))
             self.connection.commit()
             return
 
         num = "?, "*(self.__arch[type][1])
         args = self.__arch[type][0].replace(" TEXT","")
-        print(data)
-        print(f"INSERT INTO {type} ({args}) VALUES ({num[:-2]})", data)
+        # print(data)
+        print("\n\n")
+        print(f"INSERT INTO {type} ({args}) VALUES ({num[:-2]})\n\n", data)
         self.cursor.execute(f"INSERT INTO {type} ({args}) VALUES ({num[:-2]})",data)
         self.connection.commit()
 
@@ -80,6 +81,7 @@ class Controlador:
         if type == "Scheduler":
             print("\n\n",value,"\n\n")
             self.cursor.execute("DELETE FROM Scheduler WHERE Title = ? AND Date = ?", (value[1], value[0]))
+            # print(value[0])
             self.connection.commit()
             return
 
@@ -124,3 +126,5 @@ class Controlador:
                         photos.append(file)
         return photos
 
+con = Controlador()
+# print(con.show_database("Subreddits"))
