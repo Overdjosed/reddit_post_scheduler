@@ -18,12 +18,12 @@ Para instalar la tarea programada en el Administrador de tareas de Windows, sigu
 3. Proporciona un nombre y una descripción para la tarea y haz clic en "Siguiente".
 4. Selecciona "Diariamente" como la frecuencia y haz clic en "Siguiente".
 5. Establece la hora y la repetición cada 1 hora durante un día. Haz clic en "Siguiente".
-6. Selecciona "Iniciar un programa" y proporciona la ruta completa del ejecutable de Python (python.exe). En el campo "Agregar argumentos (opcional)", especifica la ruta completa de tasks_admin.py.
+6. Selecciona "Iniciar un programa" y proporciona la ruta completa del ejecutable de Python (python.exe). En el campo "Agregar argumentos (opcional)", especifica la ruta completa de tasks_admin.exe.
 7. Haz clic en "Siguiente" y luego en "Finalizar" para crear la tarea programada.
 
 ## Uso
 
-Ejecuta el archivo [gui.py](https://github.com/Overdjosed/reddit/blob/master/reddit_scheduler/gui.py) para interactuar con el programa. En el apartado "Users", introduce tu nombre de usuario y contraseña de Reddit reales. Los otros parámetros se usarán por defecto.
+Ejecuta el archivo [gui.exe](https://github.com/Overdjosed/reddit/blob/master/reddit_scheduler/gui.py) para interactuar con el programa. En el apartado "Users", introduce tu nombre de usuario y contraseña de Reddit reales. Los otros parámetros se usarán por defecto.
 
 Podrás agregar o eliminar usuarios, posts o subreddits utilizando las opciones disponibles en el GUI.
 
@@ -35,4 +35,4 @@ Nota importante: Reddit solo admite un video a la vez, por lo que solo podrás s
 
 Con estos pasos, podrás utilizar el programador para automatizar tus publicaciones y videos en Reddit de manera efectiva. Recuerda revisar las políticas y términos de servicio de Reddit para asegurarte de cumplir con sus reglas y evitar problemas con tu cuenta.
 
-Post_scheduler v1.0
+Post_scheduler v2.0
