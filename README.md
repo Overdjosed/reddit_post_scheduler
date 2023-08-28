@@ -26,13 +26,21 @@ Para instalar la tarea programada en el Administrador de tareas de Windows, sigu
 <img width="913" alt="image" src="https://github.com/Overdjosed/reddit_post_scheduler/assets/114219289/c937289f-418a-419f-9bd4-9231fdd676a4">
 
 
+
 Ejecuta el archivo [gui.exe](https://github.com/Overdjosed/reddit/blob/master/reddit_scheduler/gui.py) para interactuar con el programa. En el apartado "Users", introduce tu nombre de usuario y contraseña de Reddit reales. Los otros parámetros se usarán por defecto.
 
 Podrás agregar o eliminar usuarios, posts o subreddits utilizando las opciones disponibles en el GUI.
 
+<img width="917" alt="image" src="https://github.com/Overdjosed/reddit_post_scheduler/assets/114219289/a19eaefa-aaf4-4b35-9830-bbd6ddebbfb7">
+
+
 Para programar una publicación o un video, especifica el contenido, fecha/hora, plataforma y si será NSFW o no. La URL de salida es opcional.
 
 La subida de archivos tendrá una variación máxima de 1 hora a la hora especificada.
+
+
+<img width="915" alt="image" src="https://github.com/Overdjosed/reddit_post_scheduler/assets/114219289/ca112352-67d1-43ed-86c0-6273b6451519">
+
 
 Nota importante: Reddit solo admite un video a la vez, por lo que solo podrás subir un video junto con las imágenes que desees, pero no podrás subir más de un video. Sin embargo, podrás subir tantas imágenes como desees.
 
